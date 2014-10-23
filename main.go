@@ -77,13 +77,12 @@ func pancakeCommandSetEnv(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	vcapServices, err := appEnv.VCAPServices()
+	setEnvVars, err := cfconfig.NewSetEnvVars(appName, appEnv)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	setEnvVars := cfconfig.NewSetEnvVars(vcapServices)
-	err = setEnvVars.UpdateEnvVars(appName)
+	err = setEnvVars.UpdateEnvVars()
 	if err != nil {
 		log.Fatal(err)
 	}

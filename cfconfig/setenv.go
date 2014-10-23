@@ -5,41 +5,35 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
-
-	"github.com/cloudfoundry-community/go-cfenv"
 )
 
 // SetEnvVars is a set of variable names and values
 type SetEnvVars struct {
-	EnvVars     map[string]string
-	EnvPrefixes []string
+	AppName         string
+	AppEnv          *AppEnv
+	RequiredEnvVars map[string]string
 }
 
 // NewSetEnvVars creates SetEnvVars
-func NewSetEnvVars(vcapServices *cfenv.Services) (envVars *SetEnvVars) {
+func NewSetEnvVars(appName string, appEnv *AppEnv) (envVars *SetEnvVars, err error) {
 	envVars = &SetEnvVars{
-		EnvVars:     map[string]string{},
-		EnvPrefixes: []string{},
+		AppName:         appName,
+		AppEnv:          appEnv,
+		RequiredEnvVars: map[string]string{},
 	}
 
-	for serviceName, serviceInstances := range *vcapServices {
-		envVars.EnvPrefixes = append(envVars.EnvPrefixes, strings.ToUpper(serviceName))
+	err = envVars.discoverEnvVars()
 
-		namePrefix := serviceName + "_"
-		serviceInstance := serviceInstances[0]
-		for credentialkey, credentialValue := range serviceInstance.Credentials {
-			envKey := strings.ToUpper(namePrefix + credentialkey)
-			envVars.EnvVars[envKey] = credentialValue
-		}
-
-	}
 	return
 }
 
 // UpdateEnvVars updates target app
-func (envVars *SetEnvVars) UpdateEnvVars(appName string) (err error) {
-	for name, value := range envVars.EnvVars {
-		err = envVars.setupEnvVars(appName, name, value)
+func (envVars *SetEnvVars) UpdateEnvVars() (err error) {
+	if err != nil {
+		return
+	}
+	for name, value := range envVars.RequiredEnvVars {
+		err = envVars.cfSetEnv(name, value)
 		if err != nil {
 			return
 		}
@@ -47,8 +41,30 @@ func (envVars *SetEnvVars) UpdateEnvVars(appName string) (err error) {
 	return
 }
 
-func (envVars *SetEnvVars) setupEnvVars(appName, name, value string) (err error) {
-	cmd := exec.Command("cf", "set-env", appName, name, value)
+func (envVars *SetEnvVars) discoverEnvVars() (err error) {
+	vcapServices, err := envVars.AppEnv.VCAPServices()
+	if err != nil {
+		return
+	}
+
+	for serviceName, serviceInstances := range *vcapServices {
+		namePrefix := serviceName + "_"
+		serviceInstance := serviceInstances[0]
+		for credentialkey, credentialValue := range serviceInstance.Credentials {
+			envKey := strings.ToUpper(namePrefix + credentialkey)
+			envVars.RequiredEnvVars[envKey] = credentialValue
+		}
+
+	}
+	return
+}
+
+func (envVars *SetEnvVars) existingEnvVars() map[string]interface{} {
+	return envVars.AppEnv.Environment
+}
+
+func (envVars *SetEnvVars) cfSetEnv(name, value string) (err error) {
+	cmd := exec.Command("cf", "set-env", envVars.AppName, name, value)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 
