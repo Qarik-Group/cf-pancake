@@ -24,7 +24,7 @@ _testmain.go
 *.prof
 
 # bin
-worlds-simplest-service-broker
+cf-pankcake*
 
 # Sublime
 broker.sublime-project
