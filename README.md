@@ -87,6 +87,20 @@ The former would be run within an application container during startup.
 
 The latter would be run by the developer outside of Cloud Foundry.
 
+Installation
+------------
+
+If you want to use `cf-pancake export` within your application on Cloud Foundry, then download the `cf-pancake_linux_amd64` release from the [releases](https://github.com/cloudfoundry-community/cf-pankcake/releases) page and add it to the project being uploaded. You will then need to create a custom startup script that uses it to create environment variables.
+
+If you want to use `cf-pancake set-env APPNAME` locally, then you can either:
+
+-	download from the [releases](https://github.com/cloudfoundry-community/cf-pankcake/releases)
+-	install via `go get`
+
+```
+go get -u https://github.com/cloudfoundry-community/cf-pankcake
+```
+
 Local development
 -----------------
 
