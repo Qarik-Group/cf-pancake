@@ -38,3 +38,29 @@ There are two usage modes:
 The former would be run within an application container during startup.
 
 The latter would be run by the developer outside of Cloud Foundry.
+
+Local development
+-----------------
+
+As `cf-pancake exports` is designed to be run within an application container, if you try to run it locally then `$VCAP_SERVICES` will be missing. You can setup a local `$VCAP_SERVICES` (and `$VCAP_APPLICATION` is also required) for a Cloud Foundry application.
+
+The [jq](http://stedolan.github.io/jq/) CLI is required for the commands below (assuming your example app has a unique name):
+
+```
+export NAME=myapp-name
+
+export VCAP_APPLICATION="{}"
+export VCAP_SERVICES=$(cf curl $(cf curl "/v2/apps?q=name:$NAME" | jq ".resources[0].metadata.url" | xargs echo)/env | jq -c -M .system_env_json.VCAP_SERVICES)
+```
+
+Confirm they are setup:
+
+```
+env | grep VCAP
+```
+
+Now run the `exports` command:
+
+```
+go run main.go exports
+```
