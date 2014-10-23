@@ -32,7 +32,7 @@ Consider a `$VCAP_SERVICES` with a Postgresql binding:
 
 There are two usage modes:
 
--	`cf-pancakes export` - returns bash `export` commands to setup flatten variables
+-	`cf-pancakes exports` - returns bash `export` commands to setup flatten variables
 -	`cf-pancakes set-env APPNAME` - updates the `APPNAME` with environment variables from that app's `$VCAP_SERVICES`
 
 The former would be run within an application container during startup.

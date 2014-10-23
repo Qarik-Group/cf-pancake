@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/codegangsta/cli"
@@ -21,23 +22,38 @@ func (vars *EnvVars) String() (out string) {
 func pancakeCommandExports(c *cli.Context) {
 	appEnv, err := cfenv.Current()
 	if err != nil {
+		fmt.Println("Requires $VCAP_SERVICES and $VCAP_APPLICATION to be set")
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("Services:", appEnv.Services)
 
-	exportVars := &EnvVars{
-		"PG_PORT": "4000",
-		"PG_HOST": "10.10.3.3",
+	exportVars := EnvVars{}
+
+	for serviceName, serviceInstances := range appEnv.Services {
+		namePrefix := serviceName + "_"
+		serviceInstance := serviceInstances[0]
+		for credentialkey, credentialValue := range serviceInstance.Credentials {
+			envKey := strings.ToUpper(namePrefix + credentialkey)
+			exportVars[envKey] = credentialValue
+		}
+
 	}
-	fmt.Print(exportVars)
+
+	fmt.Print(&exportVars)
 }
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "cf-pancake"
 	app.Usage = "Flatten $VCAP_SERVICES into many environment variables"
-	app.Action = pancakeCommandExports
+	app.Commands = []cli.Command{
+		{
+			Name:      "exports",
+			ShortName: "e",
+			Usage:     "Output `export KEY=VALUE` to STDOUT based on local $VCAP_SERVICES",
+			Action:    pancakeCommandExports,
+		},
+	}
 
 	app.Run(os.Args)
 
