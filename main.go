@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
+	"github.com/cloudfoundry-community/cf-pankcake/cfconfig"
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/codegangsta/cli"
 )
@@ -23,13 +25,13 @@ func pancakeCommandExports(c *cli.Context) {
 	appEnv, err := cfenv.Current()
 	if err != nil {
 		fmt.Println("Requires $VCAP_SERVICES and $VCAP_APPLICATION to be set")
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	exportVars := EnvVars{}
 
-	for serviceName, serviceInstances := range appEnv.Services {
+	vcapServices := appEnv.Services
+	for serviceName, serviceInstances := range vcapServices {
 		namePrefix := serviceName + "_"
 		serviceInstance := serviceInstances[0]
 		for credentialkey, credentialValue := range serviceInstance.Credentials {
@@ -42,6 +44,60 @@ func pancakeCommandExports(c *cli.Context) {
 	fmt.Print(&exportVars)
 }
 
+func pancakeCommandSetEnv(c *cli.Context) {
+	appName := c.Args().First()
+	if appName == "" {
+		fmt.Println("USAGE: cf-pancake set-env APPNAME")
+		return
+	}
+
+	configPath, err := cfconfig.DefaultCfConfigPath()
+	if err != nil {
+		log.Fatal(err)
+	}
+	config, err := cfconfig.LoadCfConfig(configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if config.SpaceFields.GUID == "" {
+		fmt.Println("Not targeting a space. Run `cf target -o ORG -s SPACE` first.")
+	}
+
+	appFindURL := fmt.Sprintf("/v2/apps?q=space_guid:%s&q=name:%s", config.SpaceFields.GUID, appName)
+	resources, err := cfconfig.CurlGETResources(appFindURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if len(resources.Resources) == 0 {
+		log.Fatalf("No application '%s' found in current org/space", appName)
+	}
+	appURL := resources.Resources[0].Metadata.URL
+	appEnv, err := cfconfig.CurlAppEnv(appURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	vcapServices, err := appEnv.VCAPServices()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	exportVars := EnvVars{}
+
+	for serviceName, serviceInstances := range *vcapServices {
+		namePrefix := serviceName + "_"
+		serviceInstance := serviceInstances[0]
+		for credentialkey, credentialValue := range serviceInstance.Credentials {
+			envKey := strings.ToUpper(namePrefix + credentialkey)
+			exportVars[envKey] = credentialValue
+		}
+
+	}
+
+	fmt.Print(&exportVars)
+
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "cf-pancake"
@@ -52,6 +108,12 @@ func main() {
 			ShortName: "e",
 			Usage:     "Output `export KEY=VALUE` to STDOUT based on local $VCAP_SERVICES",
 			Action:    pancakeCommandExports,
+		},
+		{
+			Name:      "set-env",
+			ShortName: "s",
+			Usage:     "Updates `cf set-env` for an application based on its bound services",
+			Action:    pancakeCommandSetEnv,
 		},
 	}
 
