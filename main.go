@@ -82,20 +82,11 @@ func pancakeCommandSetEnv(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	exportVars := EnvVars{}
-
-	for serviceName, serviceInstances := range *vcapServices {
-		namePrefix := serviceName + "_"
-		serviceInstance := serviceInstances[0]
-		for credentialkey, credentialValue := range serviceInstance.Credentials {
-			envKey := strings.ToUpper(namePrefix + credentialkey)
-			exportVars[envKey] = credentialValue
-		}
-
+	setEnvVars := cfconfig.NewSetEnvVars(vcapServices)
+	err = setEnvVars.UpdateEnvVars(appName)
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	fmt.Print(&exportVars)
-
 }
 
 func main() {
