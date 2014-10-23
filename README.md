@@ -30,10 +30,58 @@ Consider a `$VCAP_SERVICES` with a Postgresql binding:
   }
 ```
 
-There are two usage modes:
+There are two usage modes - within the app container before startup (`cf-pancakes exports`); or from your local machine (`cf-pancakes set-env`).
 
--	`cf-pancakes exports` - returns bash `export` commands to setup flatten variables
--	`cf-pancakes set-env APPNAME` - updates the `APPNAME` with environment variables from that app's `$VCAP_SERVICES`
+If you bundle the linux64 version of `cf-pancake` into your application, you can run it during startup to setup environment variables.
+
+`cf-pancakes exports` returns bash `export` commands to setup flatten variables.
+
+The output would look like:
+
+```
+$ cf-pancakes e
+export POSTGRESQL93_URI='postgres://ldo5vforrkoplrfb:2xmfoewk1ggtrm8y@10.10.2.7:49169/wybjfszhcd9xmbp1'
+export POSTGRESQL93_HOSTNAME='10.10.2.7'
+export POSTGRESQL93_PORT='49169'
+export POSTGRESQL93_USERNAME='ldo5vforrkoplrfb'
+export POSTGRESQL93_PASSWORD='2xmfoewk1ggtrm8y'
+export POSTGRESQL93_DBNAME='wybjfszhcd9xmbp1'
+```
+
+Save the output to a script and then `source` that script to setup the variables.
+
+Alternately, you can setup the environment variables from your local machine and store them within Cloud Foundry environment variables (as seen by `cf env`).
+
+`cf-pancakes set-env APPNAME` - updates the `APPNAME` with environment variables from that app's `$VCAP_SERVICES`
+
+The output would look like:
+
+```
+$ cf-pancakes set-env myapp
+Setting env variable 'POSTGRESQL93_URI' to 'postgres://ldo5vforrkoplrfb:2xmfoewk1ggtrm8y@10.10.2.7:49169/wybjfszhcd9xmbp1' for app myapp in org intel / space myapp as admin...
+OK
+TIP: Use 'cf restage' to ensure your env variable changes take effect
+
+Setting env variable 'POSTGRESQL93_USERNAME' to 'ldo5vforrkoplrfb' for app myapp in org intel / space myapp as admin...
+OK
+TIP: Use 'cf restage' to ensure your env variable changes take effect
+
+Setting env variable 'POSTGRESQL93_DBNAME' to 'wybjfszhcd9xmbp1' for app myapp in org intel / space myapp as admin...
+OK
+TIP: Use 'cf restage' to ensure your env variable changes take effect
+
+Setting env variable 'POSTGRESQL93_HOSTNAME' to '10.10.2.7' for app myapp in org intel / space myapp as admin...
+OK
+TIP: Use 'cf restage' to ensure your env variable changes take effect
+
+Setting env variable 'POSTGRESQL93_PASSWORD' to '2xmfoewk1ggtrm8y' for app myapp in org intel / space myapp as admin...
+OK
+TIP: Use 'cf restage' to ensure your env variable changes take effect
+
+Setting env variable 'POSTGRESQL93_PORT' to '49169' for app myapp in org intel / space myapp as admin...
+OK
+TIP: Use 'cf restage' to ensure your env variable changes take effect
+```
 
 The former would be run within an application container during startup.
 
