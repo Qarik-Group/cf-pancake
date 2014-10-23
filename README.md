@@ -30,16 +30,16 @@ Consider a `$VCAP_SERVICES` with a Postgresql binding:
   }
 ```
 
-There are two usage modes - within the app container before startup (`cf-pancakes exports`); or from your local machine (`cf-pancakes set-env`).
+There are two usage modes - within the app container before startup (`cf-pancake exports`); or from your local machine (`cf-pancake set-env`).
 
 If you bundle the linux64 version of `cf-pancake` into your application, you can run it during startup to setup environment variables.
 
-`cf-pancakes exports` returns bash `export` commands to setup flatten variables.
+`cf-pancake exports` returns bash `export` commands to setup flatten variables.
 
 The output would look like:
 
 ```
-$ cf-pancakes e
+$ cf-pancake e
 export POSTGRESQL93_URI='postgres://ldo5vforrkoplrfb:2xmfoewk1ggtrm8y@10.10.2.7:49169/wybjfszhcd9xmbp1'
 export POSTGRESQL93_HOSTNAME='10.10.2.7'
 export POSTGRESQL93_PORT='49169'
@@ -52,12 +52,12 @@ Save the output to a script and then `source` that script to setup the variables
 
 Alternately, you can setup the environment variables from your local machine and store them within Cloud Foundry environment variables (as seen by `cf env`).
 
-`cf-pancakes set-env APPNAME` - updates the `APPNAME` with environment variables from that app's `$VCAP_SERVICES`
+`cf-pancake set-env APPNAME` - updates the `APPNAME` with environment variables from that app's `$VCAP_SERVICES`
 
 The output would look like:
 
 ```
-$ cf-pancakes set-env myapp
+$ cf-pancake set-env myapp
 Setting env variable 'POSTGRESQL93_URI' to 'postgres://ldo5vforrkoplrfb:2xmfoewk1ggtrm8y@10.10.2.7:49169/wybjfszhcd9xmbp1' for app myapp in org intel / space myapp as admin...
 OK
 TIP: Use 'cf restage' to ensure your env variable changes take effect
