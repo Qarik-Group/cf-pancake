@@ -48,6 +48,12 @@ export POSTGRESQL93_PASSWORD='2xmfoewk1ggtrm8y'
 export POSTGRESQL93_DBNAME='wybjfszhcd9xmbp1'
 ```
 
+To source the environment variables:
+
+```
+$(cf-pankcake e)
+```
+
 Save the output to a script and then `source` that script to setup the variables.
 
 Alternately, you can setup the environment variables from your local machine and store them within Cloud Foundry environment variables (as seen by `cf env`).
