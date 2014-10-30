@@ -51,7 +51,7 @@ export POSTGRESQL93_DBNAME='wybjfszhcd9xmbp1'
 To source the environment variables:
 
 ```
-$(cf-pankcake e)
+$(cf-pancake e)
 ```
 
 Save the output to a script and then `source` that script to setup the variables.
@@ -96,15 +96,15 @@ The latter would be run by the developer outside of Cloud Foundry.
 Installation
 ------------
 
-If you want to use `cf-pancake export` within your application on Cloud Foundry, then download the `cf-pancake_linux_amd64` release from the [releases](https://github.com/cloudfoundry-community/cf-pankcake/releases) page and add it to the project being uploaded. You will then need to create a custom startup script that uses it to create environment variables.
+If you want to use `cf-pancake export` within your application on Cloud Foundry, then download the `cf-pancake_linux_amd64` release from the [releases](https://github.com/cloudfoundry-community/cf-pancake/releases) page and add it to the project being uploaded. You will then need to create a custom startup script that uses it to create environment variables.
 
 If you want to use `cf-pancake set-env APPNAME` locally, then you can either:
 
--	download from the [releases](https://github.com/cloudfoundry-community/cf-pankcake/releases)
+-	download from the [releases](https://github.com/cloudfoundry-community/cf-pancake/releases)
 -	install via `go get`
 
 ```
-go get -u https://github.com/cloudfoundry-community/cf-pankcake
+go get -u https://github.com/cloudfoundry-community/cf-pancake
 ```
 
 Local development
