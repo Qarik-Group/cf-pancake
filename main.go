@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cloudfoundry-community/cf-pankcake/cfconfig"
+	"github.com/cloudfoundry-community/cf-pancake/cfconfig"
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/codegangsta/cli"
 )
