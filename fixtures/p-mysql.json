@@ -1,0 +1,26 @@
+{
+  "p-mysql": [
+   {
+    "binding_name": null,
+    "credentials": {
+     "hostname": "10.144.0.17",
+     "jdbcUrl": "jdbc:mysql://10.144.0.17:3306/cf_ac66eb76_f883_41c5_8840_53fe71e7cb63?user=rR8QDBUvwvdkZAwJ\u0026password=LhggDEV5ObpQz8PH",
+     "name": "cf_ac66eb76_f883_41c5_8840_53fe71e7cb63",
+     "password": "LhggDEV5ObpQz8PH",
+     "port": 3306,
+     "uri": "mysql://rR8QDBUvwvdkZAwJ:LhggDEV5ObpQz8PH@10.144.0.17:3306/cf_ac66eb76_f883_41c5_8840_53fe71e7cb63?reconnect=true",
+     "username": "rR8QDBUvwvdkZAwJ"
+    },
+    "instance_name": "db",
+    "label": "p-mysql",
+    "name": "db",
+    "plan": "10mb",
+    "provider": null,
+    "syslog_drain_url": null,
+    "tags": [
+     "mysql"
+    ],
+    "volume_mounts": []
+   }
+  ]
+}

@@ -110,7 +110,18 @@ go get -u https://github.com/cloudfoundry-community/cf-pancake
 Local development
 -----------------
 
-As `cf-pancake exports` is designed to be run within an application container, if you try to run it locally then `$VCAP_SERVICES` will be missing. You can setup a local `$VCAP_SERVICES` (and `$VCAP_APPLICATION` is also required) for a Cloud Foundry application.
+As `cf-pancake exports` is designed to be run within an application container, if you try to run it locally then `$VCAP_SERVICES` will be missing.
+
+There are some `fixtures/` JSON you can use:
+
+```plain
+(VCAP_APPLICATION={} VCAP_SERVICES=$(cat fixtures/cleardb.json) go run main.go exports)
+(VCAP_APPLICATION={} VCAP_SERVICES=$(cat fixtures/p-mysql.json) go run main.go exports)
+(VCAP_APPLICATION={} VCAP_SERVICES=$(cat fixtures/two-services.json) go run main.go exports)
+(VCAP_APPLICATION={} VCAP_SERVICES=$(cat fixtures/empty.json) go run main.go exports)
+```
+
+You can also setup a local `$VCAP_SERVICES` (and `$VCAP_APPLICATION` is also required) for a Cloud Foundry application.
 
 The [jq](http://stedolan.github.io/jq/) CLI is required for the commands below (assuming your example app has a unique name):
 

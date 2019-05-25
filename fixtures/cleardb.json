@@ -1,0 +1,37 @@
+{
+  "cleardb": [
+    {
+    "binding_name": null,
+    "credentials": {
+      "hostname": "us-cdbr-iron-east-02.cleardb.net",
+      "jdbcUrl": "jdbc:mysql://us-cdbr-iron-east-02.cleardb.net/ad_b634bcefe9486c6?user=b86d7cbe3e9d83\u0026password=a7edf220",
+      "name": "ad_b634bcefe9486c6",
+      "password": "a7edf220",
+      "port": "3306",
+      "uri": "mysql://b86d7cbe3e9d83:a7edf220@us-cdbr-iron-east-02.cleardb.net:3306/ad_b634bcefe9486c6?reconnect=true",
+      "username": "b86d7cbe3e9d83"
+    },
+    "instance_name": "wp-mysql-db",
+    "label": "cleardb",
+    "name": "wp-mysql-db",
+    "plan": "spark",
+    "provider": null,
+    "syslog_drain_url": null,
+    "tags": [
+      "Data Stores",
+      "Cloud Databases",
+      "Developer Tools",
+      "Web-based",
+      "Data Store",
+      "Development and Test Tools",
+      "Online Backup \u0026 Storage",
+      "Single Sign-On",
+      "Buyable",
+      "mysql",
+      "relational",
+      "Cloud Security and Monitoring"
+    ],
+    "volume_mounts": []
+    }
+  ]
+}

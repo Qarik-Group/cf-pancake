@@ -1,0 +1,36 @@
+{
+  "elephantsql": [
+    {
+      "name": "elephantsql-binding-c6c60",
+      "binding_name": "elephantsql-binding-c6c60",
+      "instance_name": "elephantsql-c6c60",
+      "label": "elephantsql",
+      "tags": [
+        "postgres",
+        "postgresql",
+        "relational"
+      ],
+      "plan": "turtle",
+      "credentials": {
+        "uri": "postgres://exampleuser:examplepass@babar.elephantsql.com:5432/exampleuser"
+      }
+    }
+  ],
+  "sendgrid": [
+    {
+      "name": "mysendgrid",
+      "binding_name": null,
+      "instance_name": "mysendgrid",
+      "label": "sendgrid",
+      "tags": [
+        "smtp"
+      ],
+      "plan": "free",
+      "credentials": {
+        "hostname": "smtp.sendgrid.net",
+        "username": "QvsXMbJ3rK",
+        "password": "HCHMOYluTv"
+      }
+    }
+  ]
+}

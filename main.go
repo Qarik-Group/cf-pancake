@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/cloudfoundry-community/cf-pancake/cfconfig"
@@ -30,13 +31,14 @@ func pancakeCommandExports(c *cli.Context) {
 
 	exportVars := EnvVars{}
 
+	keyToUnderscoreRE := regexp.MustCompile(`[^A-Za-z0-9]+`)
 	vcapServices := appEnv.Services
 	for serviceName, serviceInstances := range vcapServices {
 		namePrefix := serviceName + "_"
 		serviceInstance := serviceInstances[0]
 		for credentialKey, credentialValue := range serviceInstance.Credentials {
 			if strValue, ok := credentialValue.(string); ok {
-				envKey := strings.ToUpper(namePrefix + credentialKey)
+				envKey := keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(namePrefix+credentialKey), "_")
 				exportVars[envKey] = strValue
 			}
 		}
