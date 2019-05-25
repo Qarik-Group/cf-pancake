@@ -64,9 +64,13 @@ mkdir artifacts
 gox -osarch="${TARGETS}" --output="artifacts/${BINARY}-{{.OS}}-{{.Arch}}" -ldflags="-X main.Version=${VERSION}" ./...
 go build -o "${BINARY}" -ldflags="-X main.Version=${VERSION}" ${CMD_PKG:-.}
 ./${BINARY} -v
+
+# Generate .tar.xz versions of binaries too
+pushd artifacts
+ls ${BINARY}* | xargs -L1 -i% tar cfJ "%.tar.xz" %
 popd
 
-exit 1
+popd
 
 echo "v${VERSION}"                         > ${RELEASE_ROOT}/tag
 echo "${RELEASE_NAME} v${VERSION}"         > ${RELEASE_ROOT}/name
