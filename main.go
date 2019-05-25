@@ -34,9 +34,11 @@ func pancakeCommandExports(c *cli.Context) {
 	for serviceName, serviceInstances := range vcapServices {
 		namePrefix := serviceName + "_"
 		serviceInstance := serviceInstances[0]
-		for credentialkey, credentialValue := range serviceInstance.Credentials {
-			envKey := strings.ToUpper(namePrefix + credentialkey)
-			exportVars[envKey] = credentialValue
+		for credentialKey, credentialValue := range serviceInstance.Credentials {
+			if strValue, ok := credentialValue.(string); ok {
+				envKey := strings.ToUpper(namePrefix + credentialKey)
+				exportVars[envKey] = strValue
+			}
 		}
 
 	}

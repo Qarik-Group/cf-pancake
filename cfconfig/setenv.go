@@ -50,11 +50,12 @@ func (envVars *SetEnvVars) discoverEnvVars() (err error) {
 	for serviceName, serviceInstances := range *vcapServices {
 		namePrefix := serviceName + "_"
 		serviceInstance := serviceInstances[0]
-		for credentialkey, credentialValue := range serviceInstance.Credentials {
-			envKey := strings.ToUpper(namePrefix + credentialkey)
-			envVars.RequiredEnvVars[envKey] = credentialValue
+		for credentialKey, credentialValue := range serviceInstance.Credentials {
+			if strValue, ok := credentialValue.(string); ok {
+				envKey := strings.ToUpper(namePrefix + credentialKey)
+				envVars.RequiredEnvVars[envKey] = strValue
+			}
 		}
-
 	}
 	return
 }
