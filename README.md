@@ -38,7 +38,7 @@ If you bundle the linux64 version of `cf-pancake` into your application, you can
 
 The output would look like:
 
-```
+```plain
 $ cf-pancake e
 export POSTGRESQL93_URI='postgres://ldo5vforrkoplrfb:2xmfoewk1ggtrm8y@10.10.2.7:49169/wybjfszhcd9xmbp1'
 export POSTGRESQL93_HOSTNAME='10.10.2.7'
@@ -50,7 +50,7 @@ export POSTGRESQL93_DBNAME='wybjfszhcd9xmbp1'
 
 To source the environment variables:
 
-```
+```plain
 $(cf-pancake e)
 ```
 
@@ -62,7 +62,7 @@ Alternately, you can setup the environment variables from your local machine and
 
 The output would look like:
 
-```
+```plain
 $ cf-pancake set-env myapp
 Setting env variable 'POSTGRESQL93_URI' to 'postgres://ldo5vforrkoplrfb:2xmfoewk1ggtrm8y@10.10.2.7:49169/wybjfszhcd9xmbp1' for app myapp in org intel / space myapp as admin...
 OK
@@ -100,10 +100,10 @@ If you want to use `cf-pancake export` within your application on Cloud Foundry,
 
 If you want to use `cf-pancake set-env APPNAME` locally, then you can either:
 
--	download from the [releases](https://github.com/cloudfoundry-community/cf-pancake/releases)
--	install via `go get`
+- download from the [releases](https://github.com/cloudfoundry-community/cf-pancake/releases)
+- install via `go get`
 
-```
+```plain
 go get -u https://github.com/cloudfoundry-community/cf-pancake
 ```
 
@@ -114,7 +114,7 @@ As `cf-pancake exports` is designed to be run within an application container, i
 
 The [jq](http://stedolan.github.io/jq/) CLI is required for the commands below (assuming your example app has a unique name):
 
-```
+```plain
 export NAME=myapp-name
 
 export VCAP_APPLICATION="{}"
@@ -123,12 +123,12 @@ export VCAP_SERVICES=$(cf curl $(cf curl "/v2/apps?q=name:$NAME" | jq ".resource
 
 Confirm they are setup:
 
-```
+```plain
 env | grep VCAP
 ```
 
 Now run the `exports` command:
 
-```
+```plain
 go run main.go exports
 ```
