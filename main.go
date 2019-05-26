@@ -40,10 +40,15 @@ func pancakeCommandExports(c *cli.Context) {
 			if strValue, ok := credentialValue.(string); ok {
 				serviceNameKey := keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(namePrefix+credentialKey), "_")
 				exportVars[serviceNameKey] = strValue
+
+				instanceNameKey := keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(serviceInstance.Name+"_"+credentialKey), "_")
+				exportVars[instanceNameKey] = strValue
+
 				for _, tag := range serviceInstance.Tags {
 					tagKey := keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(tag+"_"+credentialKey), "_")
 					exportVars[tagKey] = strValue
 				}
+
 			}
 		}
 
