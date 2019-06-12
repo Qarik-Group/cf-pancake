@@ -23,6 +23,18 @@ func (vars *EnvVars) String() (out string) {
 }
 
 func pancakeCommandExports(c *cli.Context) {
+	varsAndValues := exportVars(c)
+	fmt.Print(&varsAndValues)
+}
+
+func pancakeCommandEnvVarList(c *cli.Context) {
+	varsAndValues := exportVars(c)
+	for envVar := range varsAndValues {
+		fmt.Println(envVar)
+	}
+}
+
+func exportVars(c *cli.Context) EnvVars {
 	appEnv, err := cfenv.Current()
 	if err != nil {
 		fmt.Println("Requires $VCAP_SERVICES and $VCAP_APPLICATION to be set")
@@ -48,13 +60,16 @@ func pancakeCommandExports(c *cli.Context) {
 		}
 
 	}
-
-	fmt.Print(&exportVars)
+	return exportVars
 }
 
-func cleanEnvVarName(name string) string {
+func cleanEnvVarName(envVar string) string {
 	keyToUnderscoreRE := regexp.MustCompile(`[^A-Za-z0-9]+`)
-	envVar := keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(name), "_")
+	envVar = keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(envVar), "_")
+	// nonLetterPrefixRE := regexp.MustCompile(`3`)
+	// if nonLetterPrefixRE.MatchString(envVar) {
+	// 	envVar = "_" + envVar
+	// }
 	return envVar
 }
 
@@ -112,6 +127,11 @@ func main() {
 			ShortName: "e",
 			Usage:     "Output `export KEY=VALUE` to STDOUT based on local $VCAP_SERVICES",
 			Action:    pancakeCommandExports,
+		},
+		{
+			Name:   "envvars",
+			Usage:  "The list of environment variables to be produced from $VCAP_SERVICES [used for testing]",
+			Action: pancakeCommandEnvVarList,
 		},
 		{
 			Name:      "set-env",
