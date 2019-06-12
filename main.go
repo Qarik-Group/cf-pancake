@@ -7,9 +7,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/starkandwayne/cf-pancake/cfconfig"
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/codegangsta/cli"
+	"github.com/starkandwayne/cf-pancake/cfconfig"
 )
 
 // EnvVars is a set of variable names and values
@@ -31,22 +31,17 @@ func pancakeCommandExports(c *cli.Context) {
 
 	exportVars := EnvVars{}
 
-	keyToUnderscoreRE := regexp.MustCompile(`[^A-Za-z0-9]+`)
 	vcapServices := appEnv.Services
 	for serviceName, serviceInstances := range vcapServices {
 		namePrefix := serviceName + "_"
 		serviceInstance := serviceInstances[0]
 		for credentialKey, credentialValue := range serviceInstance.Credentials {
 			if strValue, ok := credentialValue.(string); ok {
-				serviceNameKey := keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(namePrefix+credentialKey), "_")
-				exportVars[serviceNameKey] = strValue
-
-				instanceNameKey := keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(serviceInstance.Name+"_"+credentialKey), "_")
-				exportVars[instanceNameKey] = strValue
+				exportVars[cleanEnvVarName(namePrefix+credentialKey)] = strValue
+				exportVars[cleanEnvVarName(serviceInstance.Name+"_"+credentialKey)] = strValue
 
 				for _, tag := range serviceInstance.Tags {
-					tagKey := keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(tag+"_"+credentialKey), "_")
-					exportVars[tagKey] = strValue
+					exportVars[cleanEnvVarName(tag+"_"+credentialKey)] = strValue
 				}
 
 			}
@@ -55,6 +50,12 @@ func pancakeCommandExports(c *cli.Context) {
 	}
 
 	fmt.Print(&exportVars)
+}
+
+func cleanEnvVarName(name string) string {
+	keyToUnderscoreRE := regexp.MustCompile(`[^A-Za-z0-9]+`)
+	envVar := keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(name), "_")
+	return envVar
 }
 
 func pancakeCommandSetEnv(c *cli.Context) {
