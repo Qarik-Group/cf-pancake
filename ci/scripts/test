@@ -1,11 +1,8 @@
 #!/bin/bash
 
-set -e
+set -eu
 
-export GOPATH=${PWD}/gopath
-export PATH=${PATH}:${GOPATH}/bin
-cd ${GOPATH}/src/${MODULE}
-
+cd git
 
 go version; echo; echo
 go vet $(go list ./... | grep -v vendor)
