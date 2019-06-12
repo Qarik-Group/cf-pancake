@@ -118,9 +118,8 @@ jobs:
                 tag:        (( grab meta.image.tag ))
             inputs:
               - name: git-pull-requests
-                path: (( concat "gopath/src/" meta.go.module ))
             run:
-              path: (( concat "./gopath/src/" meta.go.module "/ci/scripts/test" ))
+              path: ./git-pull-requests/ci/scripts/test
               args: []
             params:
               MODULE: (( grab meta.go.module ))
