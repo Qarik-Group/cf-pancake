@@ -115,10 +115,17 @@ As `cf-pancake exports` is designed to be run within an application container, i
 There are some `fixtures/` JSON you can use:
 
 ```plain
+(VCAP_APPLICATION={} VCAP_SERVICES=$(cat fixtures/elephantsql.json) go run main.go exports)
 (VCAP_APPLICATION={} VCAP_SERVICES=$(cat fixtures/cleardb.json) go run main.go exports)
 (VCAP_APPLICATION={} VCAP_SERVICES=$(cat fixtures/p-mysql.json) go run main.go exports)
 (VCAP_APPLICATION={} VCAP_SERVICES=$(cat fixtures/two-services.json) go run main.go exports)
 (VCAP_APPLICATION={} VCAP_SERVICES=$(cat fixtures/empty.json) go run main.go exports)
+```
+
+To check for errors, `eval` the results:
+
+```plain
+./test/test_eval.sh
 ```
 
 You can also setup a local `$VCAP_SERVICES` (and `$VCAP_APPLICATION` is also required) for a Cloud Foundry application.

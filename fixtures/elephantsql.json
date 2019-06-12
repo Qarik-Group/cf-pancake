@@ -1,0 +1,44 @@
+{"elephantsql":[{
+  "label": "elephantsql",
+  "provider": null,
+  "plan": "turtle",
+  "name": "myapp-db",
+  "tags": [
+    "Data Stores",
+    "Web-based",
+    "Open Source",
+    "User Provisioning",
+    "PaaS",
+    "Midsize Business",
+    "Windows",
+    "New Product",
+    "3rd Party Developer",
+    "Restaurant and Hospitality",
+    "Developer Tools",
+    "Retail",
+    "postgresql",
+    "Buyable",
+    "Importable",
+    "Single Sign-On",
+    "Manufacuring",
+    "Mac",
+    "Android",
+    "Professional Services",
+    "Data Store",
+    "Government and Education",
+    "Healthcare",
+    "relational",
+    "Small Business",
+    "IT Management"
+  ],
+  "instance_name": "myapp-db",
+  "binding_name": null,
+  "credentials": {
+    "uri": "postgres://efmpxxxa:wxVigKB_X8ACpkKjTHQ7WAqilCB9Rb9D@raja.db.elephantsql.com:5432/efmpxxxa",
+    "max_conns": "5"
+  },
+  "syslog_drain_url": null,
+  "volume_mounts": [
+
+  ]
+}]}
