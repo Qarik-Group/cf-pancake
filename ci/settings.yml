@@ -22,7 +22,7 @@ meta:
     secret_key:  ((aws-secret-key))
 
   github:
-    owner:  cloudfoundry-community
+    owner:  starkandwayne
     repo:   cf-pancake
     branch: master
     private_key:  ((github-private-key))

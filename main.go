@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/cloudfoundry-community/cf-pancake/cfconfig"
+	"github.com/starkandwayne/cf-pancake/cfconfig"
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/codegangsta/cli"
 )
