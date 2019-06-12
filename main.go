@@ -66,10 +66,10 @@ func exportVars(c *cli.Context) EnvVars {
 func cleanEnvVarName(envVar string) string {
 	keyToUnderscoreRE := regexp.MustCompile(`[^A-Za-z0-9]+`)
 	envVar = keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(envVar), "_")
-	// nonLetterPrefixRE := regexp.MustCompile(`3`)
-	// if nonLetterPrefixRE.MatchString(envVar) {
-	// 	envVar = "_" + envVar
-	// }
+	nonLetterPrefixRE := regexp.MustCompile(`^[^a-zA-Z]`)
+	if nonLetterPrefixRE.MatchString(envVar) {
+		envVar = "_" + envVar
+	}
 	return envVar
 }
 

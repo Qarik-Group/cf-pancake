@@ -11,9 +11,8 @@ for fixture in $(ls fixtures/*.json); do
       [[ "${!envvar:-MISSING}" == "MISSING" ]] && { touch missingvar; }
     done
   )
-  [[ -f missingvar ]] && { failed=1; rm -f missingvar; }
+  [[ -f missingvar ]] && { failed=1; rm -f missingvar; echo "Failed."; }
 done
 
-echo $failed
 [[ "$failed" == "0" ]] && { echo "Success!"; } || { echo "FAILED!"; }
 exit $failed
