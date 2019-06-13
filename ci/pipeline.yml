@@ -64,11 +64,14 @@ groups:
     jobs:
       - test
       - test-pr
+      - pre
       - rc
       - shipit
+  - name: versioning
+    jobs:
       - major
       - minor
-      - bump-patch
+      - patch
 
 jobs:
   - name: test
@@ -164,11 +167,12 @@ jobs:
 
   - name: rc
     public: true
+    serial_groups: [version]
     plan:
       - do:
         - aggregate:
-            - { get: git,     trigger: true,  passed: [test] }
-            - { get: version, trigger: true, params: {pre: rc} }
+            - { get: git,     trigger: true,  passed: [pre] }
+            - { get: version, trigger: false, passed: [pre], params: {pre: pre} }
         - put: version
           params: {file: version/number}
         on_failure:
@@ -179,8 +183,9 @@ jobs:
             icon_url: (( grab meta.slack.icon ))
             text:    '(( concat meta.slack.fail_url " " meta.pipeline ": rc job failed" ))'
 
-  - name: bump-patch
+  - name: patch
     public: true
+    serial_groups: [version]
     plan:
       - do:
         - { get: version, trigger: true, params: { bump: patch, pre: rc }, passed: [shipit] } # bump rc + patch, so that subesquent version bumps can trigger a new bump-patch
@@ -195,6 +200,7 @@ jobs:
 
   - name: minor
     public: true
+    serial_groups: [version]
     plan:
       - do:
         - { get: version, trigger: false, params: {bump: minor} }
@@ -209,6 +215,7 @@ jobs:
 
   - name: major
     public: true
+    serial_groups: [version]
     plan:
       - do:
         - { get: version, trigger: false, params: {bump: major} }
@@ -292,6 +299,60 @@ jobs:
             icon_url: (( grab meta.slack.icon ))
             text:    '(( concat meta.slack.fail_url " " meta.pipeline ": shipit job failed" ))'
 
+  - name: pre
+    public: true
+    serial: true
+    plan:
+    - do:
+      - get: git
+        passed:
+        - test
+        trigger: true
+      - get: version
+        trigger: true
+      - task: release-notes
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: starkandwayne/concourse
+              tag: latest
+          run:
+            path: sh
+            args:
+            - -ce
+            - |
+              cd git
+              if [ -f ci/release_notes.md ]; then
+                echo "######   RELEASE NOTES   ###############"
+                echo
+                cat ci/release_notes.md
+                echo
+                echo "########################################"
+                echo
+              else
+                echo "NO RELEASE NOTES HAVE BEEN WRITTEN"
+                echo "You *might* want to do that before"
+                echo "hitting (+) on that shipit job..."
+                echo
+              fi
+          inputs:
+          - name: git
+      on_failure:
+        put: notify
+        params:
+          link: https://pipes.starkandwayne.com/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+          message: release candidate job 'pre' failed (which is unusual).
+          ok: false
+          topic: vault-pipeline-$BUILD_JOB_NAME
+      on_success:
+        put: notify
+        params:
+          link: https://pipes.starkandwayne.com/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+          message: release candidate job 'pre' succeeded.
+          ok: true
+          topic: vault-pipeline-$BUILD_JOB_NAME
 resource_types:
   - name: slack-notification
     type: docker-image
