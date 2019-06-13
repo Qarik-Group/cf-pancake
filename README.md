@@ -1,114 +1,137 @@
-cf-pancake
-==========
+# Flatten $VCAP_SERVICES into simple env vars
 
-Flatten `$VCAP_SERVICES` into regular environment variables.
+Flatten `$VCAP_SERVICES` into simple, regular environment variables.
 
-Consider a `$VCAP_SERVICES` with a Postgresql binding:
+Instead of `$VCAP_SERVICES` with a PostgreSQL binding:
 
 ```json
 {
-    "postgresql93": [
-      {
-        "credentials": {
-          "dbname": "6jmpbpi4wovsk44l",
-          "hostname": "10.10.2.7",
-          "password": "yinredrg1va6xihy",
-          "port": "49165",
-          "uri": "postgres://2ibio9h9data939m:yinredrg1va6xihy@10.10.2.7:49165/6jmpbpi4wovsk44l",
-          "username": "2ibio9h9data939m"
-        },
-        "label": "postgresql93",
-        "name": "atk-pg",
-        "plan": "free",
-        "tags": [
-          "postgresql93",
-          "postgresql",
-          "relational"
-        ]
-      }
-    ]
+  "elephantsql":[{
+  "label": "elephantsql",
+  "plan": "turtle",
+  "name": "myapp-db",
+  "tags": ["postgresql"],
+  "instance_name": "myapp-db",
+  "credentials": {
+    "uri": "postgres://user:password@raja.db.elephantsql.com:5432/dbname",
+    "max_conns": "5"
   }
+}]}
 ```
 
-There are two usage modes - within the app container before startup (`cf-pancake exports`); or from your local machine (`cf-pancake set-env`).
-
-If you bundle the linux64 version of `cf-pancake` into your application, you can run it during startup to setup environment variables.
-
-`cf-pancake exports` returns bash `export` commands to setup flatten variables.
-
-The output would look like:
+You will get environment variables based on the service name/label `elephantsql`:
 
 ```plain
-$ cf-pancake e
-export POSTGRESQL93_URI='postgres://ldo5vforrkoplrfb:2xmfoewk1ggtrm8y@10.10.2.7:49169/wybjfszhcd9xmbp1'
-export POSTGRESQL93_HOSTNAME='10.10.2.7'
-export POSTGRESQL93_PORT='49169'
-export POSTGRESQL93_USERNAME='ldo5vforrkoplrfb'
-export POSTGRESQL93_PASSWORD='2xmfoewk1ggtrm8y'
-export POSTGRESQL93_DBNAME='wybjfszhcd9xmbp1'
+export ELEPHANTSQL_URI=postgres://user:password@raja.db.elephantsql.com:5432/dbname
+export ELEPHANTSQL_MAX_CONNS=5
 ```
 
-To source the environment variables:
+And you'll get env vars based on the service instance named you choose `myapp-db`:
 
 ```plain
-$(cf-pancake e)
+export MYAPP_DB_URI=postgres://user:password@raja.db.elephantsql.com:5432/dbname
+export MYAPP_DB_MAX_CONNS=5
 ```
 
-Save the output to a script and then `source` that script to setup the variables.
-
-Alternately, you can setup the environment variables from your local machine and store them within Cloud Foundry environment variables (as seen by `cf env`).
-
-`cf-pancake set-env APPNAME` - updates the `APPNAME` with environment variables from that app's `$VCAP_SERVICES`
-
-The output would look like:
+And you'll get env vars based on each tag within the service instance:
 
 ```plain
-$ cf-pancake set-env myapp
-Setting env variable 'POSTGRESQL93_URI' to 'postgres://ldo5vforrkoplrfb:2xmfoewk1ggtrm8y@10.10.2.7:49169/wybjfszhcd9xmbp1' for app myapp in org intel / space myapp as admin...
-OK
-TIP: Use 'cf restage' to ensure your env variable changes take effect
-
-Setting env variable 'POSTGRESQL93_USERNAME' to 'ldo5vforrkoplrfb' for app myapp in org intel / space myapp as admin...
-OK
-TIP: Use 'cf restage' to ensure your env variable changes take effect
-
-Setting env variable 'POSTGRESQL93_DBNAME' to 'wybjfszhcd9xmbp1' for app myapp in org intel / space myapp as admin...
-OK
-TIP: Use 'cf restage' to ensure your env variable changes take effect
-
-Setting env variable 'POSTGRESQL93_HOSTNAME' to '10.10.2.7' for app myapp in org intel / space myapp as admin...
-OK
-TIP: Use 'cf restage' to ensure your env variable changes take effect
-
-Setting env variable 'POSTGRESQL93_PASSWORD' to '2xmfoewk1ggtrm8y' for app myapp in org intel / space myapp as admin...
-OK
-TIP: Use 'cf restage' to ensure your env variable changes take effect
-
-Setting env variable 'POSTGRESQL93_PORT' to '49169' for app myapp in org intel / space myapp as admin...
-OK
-TIP: Use 'cf restage' to ensure your env variable changes take effect
+export POSTGRESQL_URI=postgres://user:password@raja.db.elephantsql.com:5432/dbname
+export POSTGRESQL_MAX_CONNS=5
 ```
 
-The former would be run within an application container during startup.
+## Install
 
-The latter would be run by the developer outside of Cloud Foundry.
+You don't typically install or use `cf-pancake` CLI directly.
 
-Installation
-------------
+### Buildpack Usage
 
-If you want to use `cf-pancake export` within your application on Cloud Foundry, then download the `cf-pancake_linux_amd64` release from the [releases](https://github.com/starkandwayne/cf-pancake/releases) page and add it to the project being uploaded. You will then need to create a custom startup script that uses it to create environment variables.
+Commonly you will use the [pancake-buildpack Cloud Foundry buildpack](https://github.com/starkandwayne/pancake-buildpack).
 
-If you want to use `cf-pancake set-env APPNAME` locally, then you can either:
+If your platform operator has installed the buildpack as a system buildpack:
 
-- download from the [releases](https://github.com/starkandwayne/cf-pancake/releases)
-- install via `go get`
+```yaml
+applications:
+- name: myapp
+  services:
+  - myapp-db
+  buildpacks:
+  - pancake_buildpack
+  - php_buildpack
+```
+
+If you do not see `pancake_buildpack` within your `cf buildpacks` list, then you have two options:
+
+Y can use the buildpack with its Git URL:
+
+```yaml
+applications:
+- name: myapp
+  services:
+  - myapp-db
+  buildpacks:
+  - https://github.com/starkandwayne/pancake-buildpack
+  - php_buildpack
+```
+
+Or you can use a [pre-built buildpack release](https://github.com/starkandwayne/pancake-buildpack/releases), for example:
+
+```yaml
+applications:
+- name: myapp
+  services:
+  - myapp-db
+  buildpacks:
+  - https://github.com/starkandwayne/pancake-buildpack/releases/download/v1.0.0/pancake_buildpack-cached-cflinuxfs3-v1.0.0.zip
+  - php_buildpack
+```
+
+### Cloud Native Buildpack
+
+If you are dabbling with Cloud Native Builpacks then check out [pancake-cnb](https://github.com/starkandwayne/pancake-cnb).
+
+### Legacy Cloud Foundry
+
+If your Cloud Foundry is old and does not support multi-buildpacks, or does not allow "supply buildpacks" (you get errors with the buildpack complaining about a missing `bin/compile` file), then you have one more option.
+
+Download the latest `cf-pancake` [release](https://github.com/starkandwayne/cf-pancake/releases) for linux-amd64 and store within your application source code prior to `cf push`:
 
 ```plain
-go get -u https://github.com/starkandwayne/cf-pancake
+mkdir -p vendor
+curl -o vendor/cf-pancake -L $(curl -sSL https://api.github.com/repos/starkandwayne/cf-pancake/releases/latest | jq -r '.assets[] | select(.name == "cf-pancake-linux-amd64") | .browser_download_url')
 ```
 
-Local development
------------------
+And create a `.profile` script to use `cf-pancake`:
+
+```bash
+#!/bin/bash
+
+chmod +x vendor/cf-pancake
+eval "$(./vendor/cf-pancake exports)"
+```
+
+## Usage
+
+Once you have installed `cf-pancake` using one of the methods above, your application and your `cf ssh` shell should now see the generated environment variables.
+
+When using `cf ssh`, remember to run `/tmp/lifecycle/shell` in order to load your application's runtime environment (which includes `cf-pancake` behaviour):
+
+```plain
+# cf ssh phpapp
+$ /tmp/lifecycle/shell
+$ env
+```
+
+If you used the `.profile` (non-buildpack) approach above, then you need to source the `.profile` explicitly during `cf ssh`:
+
+```plain
+# cf ssh phpapp
+$ /tmp/lifecycle/shell
+$ source .profile
+$ env
+```
+
+## Local development
 
 As `cf-pancake exports` is designed to be run within an application container, if you try to run it locally then `$VCAP_SERVICES` will be missing.
 
