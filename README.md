@@ -1,4 +1,4 @@
-# Flatten $VCAP_SERVICES into simple env vars
+# Pancake
 
 Flatten `$VCAP_SERVICES` into simple, regular environment variables.
 
