@@ -4,23 +4,12 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
-	"strings"
 
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/codegangsta/cli"
 	"github.com/starkandwayne/cf-pancake/cfconfig"
+	"github.com/starkandwayne/cf-pancake/flatten"
 )
-
-// EnvVars is a set of variable names and values
-type EnvVars map[string]string
-
-func (vars *EnvVars) String() (out string) {
-	for envVar, value := range *vars {
-		out += fmt.Sprintf("export %s='%s'\n", envVar, value)
-	}
-	return
-}
 
 func pancakeCommandExports(c *cli.Context) {
 	varsAndValues := exportVars(c)
@@ -34,43 +23,14 @@ func pancakeCommandEnvVarList(c *cli.Context) {
 	}
 }
 
-func exportVars(c *cli.Context) EnvVars {
+func exportVars(c *cli.Context) flatten.EnvVars {
 	appEnv, err := cfenv.Current()
 	if err != nil {
 		fmt.Println("Requires $VCAP_SERVICES and $VCAP_APPLICATION to be set")
 		log.Fatal(err)
 	}
 
-	exportVars := EnvVars{}
-
-	vcapServices := appEnv.Services
-	for serviceName, serviceInstances := range vcapServices {
-		namePrefix := serviceName + "_"
-		serviceInstance := serviceInstances[0]
-		for credentialKey, credentialValue := range serviceInstance.Credentials {
-			if strValue, ok := credentialValue.(string); ok {
-				exportVars[cleanEnvVarName(namePrefix+credentialKey)] = strValue
-				exportVars[cleanEnvVarName(serviceInstance.Name+"_"+credentialKey)] = strValue
-
-				for _, tag := range serviceInstance.Tags {
-					exportVars[cleanEnvVarName(tag+"_"+credentialKey)] = strValue
-				}
-
-			}
-		}
-
-	}
-	return exportVars
-}
-
-func cleanEnvVarName(envVar string) string {
-	keyToUnderscoreRE := regexp.MustCompile(`[^A-Za-z0-9]+`)
-	envVar = keyToUnderscoreRE.ReplaceAllString(strings.ToUpper(envVar), "_")
-	nonLetterPrefixRE := regexp.MustCompile(`^[^a-zA-Z]`)
-	if nonLetterPrefixRE.MatchString(envVar) {
-		envVar = "_" + envVar
-	}
-	return envVar
+	return flatten.VCAPServices(&appEnv.Services)
 }
 
 func pancakeCommandSetEnv(c *cli.Context) {
